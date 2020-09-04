@@ -1,0 +1,689 @@
+var NdviEvi = ee.ImageCollection("MODIS/006/MOD13Q1"),
+    Ndwi = ee.ImageCollection("MODIS/MCD43A4_NDWI"),
+    WaterMask = ee.Image("MODIS/MOD44W/MOD44W_005_2000_02_24"),
+    Croplands = ee.Image("USGS/GFSAD1000_V0"),
+    Center = /* color: #98ff00 */ee.Geometry.Point([112.0888853667166, 29.53008305449045]),
+    Hunan = 
+    /* color: #d63000 */
+    /* shown: false */
+    ee.Geometry.Polygon(
+        [[[111.73423549689416, 29.18976994955696],
+          [112.89878627814416, 29.18976994955696],
+          [112.89878627814416, 29.958936721360907],
+          [111.73423549689416, 29.958936721360907],
+          [111.73423549689416, 29.18976994955696]]]),
+    crops1 = 
+    /* color: #d63000 */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[112.43495757664542, 29.48694334539681],
+         [112.43221099461417, 29.484851363774993],
+         [112.44972045506339, 29.467815048751604],
+         [112.37865264500479, 29.484851363774993],
+         [112.41882140721182, 29.447188311051786],
+         [112.41641814793448, 29.489931815646866],
+         [112.4613934286962, 29.47588523909152],
+         [112.49091918553214, 29.364938658633708],
+         [112.4888592490087, 29.37840224553284],
+         [112.38380248631339, 29.49979314201186],
+         [112.54070098484854, 29.496207316234447],
+         [112.44628722752432, 29.506665619863256],
+         [112.31754119480948, 29.50576923616182],
+         [112.36697967137198, 29.498000244992987],
+         [112.33917052830557, 29.579843485671013],
+         [112.50290267113621, 29.50462877323399],
+         [112.37326219773612, 29.57449417828673],
+         [112.35815599656425, 29.618676246502094],
+         [112.33721330857597, 29.57329979980178],
+         [112.22220018601737, 29.548214588417814],
+         [112.3456356256879, 29.64330584314248],
+         [112.2412655085004, 29.654942346769122],
+         [112.25534174141056, 29.685071652898245],
+         [112.11784521148977, 29.535950687661963],
+         [112.10514226959523, 29.559844405838714],
+         [112.29890688426435, 29.63626632270781],
+         [112.32465609080732, 29.543732348544463],
+         [112.43005617625654, 29.52043232892882],
+         [112.21703214923225, 29.487434998781882],
+         [112.42199583331428, 29.50133828101892],
+         [112.19943223779661, 29.39532488304947],
+         [112.24097429101927, 29.454832590118077],
+         [112.24646745508177, 29.43958519383475],
+         [112.24200425928099, 29.486814778689705],
+         [112.2426909047888, 29.48173417052802],
+         [112.06416307275755, 29.609269872109646],
+         [112.15205369775755, 29.60329989631026],
+         [112.27358995264036, 29.651348168449427],
+         [112.25264726465208, 29.68147855109484],
+         [112.3496359426306, 29.61800691304221],
+         [112.3704913866356, 29.430105771014784],
+         [112.43400609610826, 29.517381741199717],
+         [112.22354924796373, 29.359445299513165],
+         [112.23487889884264, 29.364232814884723],
+         [112.23590886710436, 29.3534605888309],
+         [112.24037206290514, 29.35136585702688],
+         [112.22045934317858, 29.33730011392698],
+         [112.20157659171373, 29.322334426672782],
+         [112.20294988272936, 29.31754494292698],
+         [112.20981633780748, 29.333109942890992],
+         [112.20844304679186, 29.35046810164101],
+         [112.1390918505028, 29.257357906439477],
+         [112.11677587149889, 29.266043796970735],
+         [112.14389836905748, 29.22650205728118],
+         [112.1342853319481, 29.230097392233343],
+         [112.1229556810692, 29.237587267915206],
+         [112.1833804857567, 29.254063065320857],
+         [112.15866124747545, 29.263348254725454],
+         [112.15831792472154, 29.273231562187554],
+         [112.1727374803856, 29.29329473152845],
+         [112.04124486563951, 29.237287683409015],
+         [112.00965917228014, 29.268439774863193],
+         [112.02476537345201, 29.273231562187554],
+         [112.08107030509264, 29.31993971290698],
+         [112.13085210440904, 29.337599405268264],
+         [112.11574590323717, 29.28910275311293],
+         [112.13600194571764, 29.281017737478965],
+         [112.20329320548326, 29.36902010518776],
+         [112.08244359610826, 29.34777478802253],
+         [112.00588262198717, 29.294836657537086],
+         [112.03746831534654, 29.32447457464223],
+         [112.02201879142076, 29.33884137507203],
+         [112.00965917228014, 29.23553501652661],
+         [112.17154025837291, 29.32774946215252],
+         [112.34234400593901, 29.481416981953917],
+         [112.22527094685698, 29.51817104415128],
+         [112.44084772959688, 29.51789830930729],
+         [112.46694025889376, 29.4993734888147],
+         [112.50865397349337, 29.507441166024424],
+         [112.37956461802462, 29.515806967081623],
+         [112.42265162363985, 29.525872819585132],
+         [112.37681803599337, 29.504660301907716],
+         [112.43192908355596, 29.53378004265778],
+         [112.37201926299932, 29.541695632349057],
+         [112.42695090362432, 29.56499075230612],
+         [112.3299622256458, 29.543637097444233],
+         [112.53372428008916, 29.54274104126413],
+         [112.4779343325794, 29.492997474887133],
+         [112.427622892513, 29.555985586816764],
+         [112.41457662786456, 29.559270656762976],
+         [112.30317887503269, 29.51486120500027],
+         [112.28927430349948, 29.503357942823058],
+         [112.31210526663425, 29.51187347036238],
+         [112.37767753653175, 29.59066687795449],
+         [112.36342964224464, 29.600219866072766],
+         [112.35278663687355, 29.596189809532344],
+         [112.34798011831886, 29.542141653989432],
+         [112.32888684706066, 29.66658419601684],
+         [112.27083003973196, 29.648546019989496],
+         [112.33400142645071, 29.65540837889815]]),
+    NonCrop1 = 
+    /* color: #98ff00 */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[112.56127367120808, 29.526092021806427],
+         [112.55578050714558, 29.52818315145647],
+         [112.56625185113973, 29.530722322201107],
+         [112.54942903619832, 29.532514639642635],
+         [112.49672899347371, 29.532365281068984],
+         [112.54084596735066, 29.547001372795147],
+         [112.49535570245808, 29.549390737584144],
+         [112.56058702570027, 29.523702106418767],
+         [112.62032518487996, 29.530124875995778],
+         [112.64367113214558, 29.490536205622256],
+         [112.642126179753, 29.505477145345065],
+         [112.64401445489949, 29.503086743113155],
+         [112.65448579889363, 29.465729380471696],
+         [112.65593440965694, 29.46328009556406],
+         [112.46699113863474, 29.486741288451846],
+         [112.46905107515818, 29.486442435982802],
+         [112.47317094820505, 29.485994155626532],
+         [112.47576134264696, 29.580965736186723],
+         [112.61628955013667, 29.58650135318668],
+         [112.63551562435542, 29.546486741905436],
+         [112.57423251278315, 29.542902570567687],
+         [112.406347686123, 29.550966777359495],
+         [112.51140444881831, 29.58665063174531],
+         [112.5411018670312, 29.581724322719523],
+         [112.5370596444983, 29.622023420744053],
+         [112.4440191781897, 29.6068012097236],
+         [112.4158667123694, 29.60486095885548],
+         [112.55044923190064, 29.59650252834278],
+         [112.3519483951579, 29.66785061850011],
+         [112.46129669227705, 29.68037912530875],
+         [112.46575988807783, 29.68216878456331],
+         [112.39486373939619, 29.63323996896664],
+         [112.30147995033369, 29.620705592840157],
+         [112.72299894939997, 29.393221077380645],
+         [112.763167711607, 29.43867828609717],
+         [112.7027429069195, 29.426119774843958],
+         [112.44937071453668, 29.455121606641566],
+         [112.38036284100153, 29.463790648277165],
+         [112.68798002850153, 29.518776952639346],
+         [112.54309782635309, 29.513996719837635],
+         [112.73501524578668, 29.457214201764515],
+         [112.686263414732, 29.450039410221965],
+         [112.71063933025934, 29.47574673124351],
+         [112.70136961590387, 29.476344498382456],
+         [112.63304838787653, 29.539389119723985],
+         [112.53841654392376, 29.531556010724337],
+         [112.75402323337688, 29.48404842045139],
+         [112.1645025564319, 29.41736527661746],
+         [112.16621917020143, 29.48821691935451],
+         [112.18750518094362, 29.387455233700486],
+         [112.06940215359987, 29.392241431807356],
+         [112.10030120145143, 29.447864452919255],
+         [112.11609404813112, 29.482239789548114],
+         [112.13532012234987, 29.486722669956553],
+         [112.13943999539674, 29.4998713082979],
+         [111.8953375173694, 29.45503939825214],
+         [111.90022986661256, 29.452872020330823],
+         [111.91593688260377, 29.442781893036607],
+         [111.8737081838733, 29.454889925399147],
+         [111.87430899869264, 29.46146652259678],
+         [111.88538115750612, 29.463035874821657],
+         [111.95601981412233, 29.451078293245274],
+         [111.95910971890748, 29.445098973961773],
+         [111.93507712613405, 29.45780460630997],
+         [111.97876494656862, 29.44734125997724],
+         [111.95164244901002, 29.461391790932783],
+         [111.95310157071413, 29.45907508203857],
+         [111.94580596219362, 29.45638464401907],
+         [112.09820968535152, 29.431991550182588],
+         [112.07160217192379, 29.38578347929824],
+         [112.1026728811523, 29.430047944655968],
+         [111.8939326467773, 29.38877492866135],
+         [111.88380462553707, 29.39475756349267],
+         [111.89255935576168, 29.3986460874311],
+         [111.90509063627925, 29.430197454094017],
+         [111.81562157193099, 29.307961030126886],
+         [111.81098671475326, 29.315744558083814],
+         [111.8130466512767, 29.313200008491282],
+         [111.81733818570052, 29.30601505538201],
+         [111.77734108487044, 29.27816858555199],
+         [111.77991600552474, 29.28370854197348],
+         [111.7833492330638, 29.28745158572549],
+         [111.80600853482161, 29.288799047903247],
+         [111.76498146572982, 29.304667820364376],
+         [111.78180428067122, 29.27861778239723],
+         [111.81287498989974, 29.305865363480347],
+         [111.85081215420638, 29.27741991975543],
+         [111.85287209072982, 29.27622204307281],
+         [111.90471382656966, 29.27622204307281],
+         [111.8492672018138, 29.326371108649997],
+         [111.85098381558333, 29.32337782611809],
+         [111.90591545620833, 29.316193589660276],
+         [111.88909264126693, 29.323976489651947],
+         [111.74575539151107, 29.265440521151106],
+         [111.7503902486888, 29.27412572509356],
+         [111.7474720052806, 29.273975986449724],
+         [111.82248802700911, 29.297182857606202],
+         [111.8822261861888, 29.330411900720087],
+         [111.89973564663802, 29.266788273577276],
+         [111.9122669271556, 29.27412572509356]]),
+    crops2 = 
+    /* color: #0b4a8b */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[112.55916346142413, 29.69848725236603],
+         [112.48191584179523, 29.713397418306354],
+         [112.31128443310382, 29.66358881588889],
+         [112.2385000092757, 29.65284839854989],
+         [112.14305628368976, 29.591665846748832],
+         [112.13172663281085, 29.602711298156567],
+         [112.25154627392413, 29.63882446182923],
+         [112.27351893017413, 29.650461483458745],
+         [112.32963084757674, 29.54328335273552],
+         [112.35984324992049, 29.613748452084884],
+         [112.22251414835799, 29.54388072120013],
+         [112.17994212687361, 29.555528700643443],
+         [112.29323863566268, 29.50325162653088],
+         [112.24380015910018, 29.498470660558187],
+         [112.15522288859236, 29.520580735770437],
+         [112.22217082560408, 29.475160219671825],
+         [112.10554577645816, 29.6329380018935],
+         [112.11172558602847, 29.58697086323905],
+         [112.07704998788394, 29.657703803984674],
+         [112.12030865487613, 29.530528018899258],
+         [112.10655999925682, 29.559008338977577],
+         [112.12269616869041, 29.500757026554695],
+         [112.41732066846251, 29.488789958464064],
+         [112.36341899609923, 29.426909962190454],
+         [112.22075429012276, 29.6047728415706],
+         [112.06248250057197, 29.60865330936312],
+         [112.16513600398994, 29.548041277813574],
+         [112.33679738094307, 29.572529336662928],
+         [112.21045460750557, 29.503230693464676],
+         [112.21451121177975, 29.325607406354223],
+         [112.02911692467038, 29.250748443704545],
+         [112.22000437584225, 29.302856086018643],
+         [112.08576517906491, 29.32231476608415],
+         [112.085421856311, 29.28249534261012],
+         [112.19116526451413, 29.252845241000287]]),
+    NonCrop2 = 
+    /* color: #ffc82d */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[112.15442972984616, 29.30375426061314],
+         [112.18223887291256, 29.27261293089549],
+         [111.84166270103756, 29.239964235958965],
+         [111.80561381187741, 29.262430052732352],
+         [111.84646921959225, 29.23247453418884],
+         [111.82998972740475, 29.288783652451794],
+         [111.83101969566647, 29.280099694193915],
+         [111.82346659508053, 29.28369314575488],
+         [111.79806071129147, 29.260333451920797],
+         [112.12215739097897, 29.32081807627984],
+         [112.14687662926022, 29.332491674344013],
+         [112.23511057701413, 29.334886093399803],
+         [112.09022837486569, 29.235770070479496],
+         [111.82827311363522, 29.347156608418615],
+         [112.1622179548143, 29.411703680951103],
+         [112.20993981760726, 29.41858212927295],
+         [112.12754395822809, 29.45118063284528],
+         [112.18907464135842, 29.380110405120767],
+         [112.16538537133889, 29.48596002682813],
+         [112.38133538354592, 29.462347784491286],
+         [112.36176598657326, 29.444709738333653],
+         [112.19491112817482, 29.460554224941554],
+         [112.23027337182717, 29.414508679722335],
+         [111.97896111596779, 29.46324455237279],
+         [112.07680810083107, 29.540635604862455],
+         [112.24984276879982, 29.5621392087236],
+         [112.48261559594826, 29.344503424042085],
+         [112.68517602075295, 29.449792201676015],
+         [112.71950829614357, 29.39237547239955],
+         [112.43592370141701, 29.398956118406275],
+         [112.63985741723732, 29.486258880720005],
+         [112.83486474145607, 29.51494474953817],
+         [112.51900780786232, 29.54541457890607],
+         [112.27524865258889, 29.614684302424937],
+         [112.05140221704201, 29.359465856944333]]),
+    VisParamClassified = {"opacity":1,"bands":["classification"],"min":0,"max":2,"gamma":1},
+    VisParamSentinelVHDiffFlooded = {"opacity":1,"bands":["VH"],"min":0.002607070383971082,"max":80.12090305236562,"gamma":1},
+    imageVisParamNovember = {"opacity":1,"bands":["NDVI"],"min":-638.2,"max":6728.314285714286,"gamma":1},
+    imageVisParamSeptember = {"opacity":1,"bands":["NDVI"],"min":377.525,"max":7766.025,"gamma":1},
+    imageVisParamJune = {"opacity":1,"bands":["NDVI"],"min":379.325,"max":7942.25,"gamma":1},
+    imageVisParamApril = {"opacity":1,"bands":["NDVI"],"min":-142.625,"max":7622.1,"gamma":1},
+    imageVisParamSentinel1VHascJunJul = {"opacity":1,"bands":["VH"],"min":-29.99376514645972,"max":-7.387407003541389,"gamma":1},
+    imageVisParamSentinel1VHascMarApr = {"opacity":1,"bands":["VH"],"min":-29.514571353031716,"max":-7.64732460783712,"gamma":1},
+    imageVisParamSentinel1VHdesc = {"opacity":1,"bands":["VH"],"min":-47.12392661350984,"max":-7.952230206558952,"gamma":1},
+    imageVisParamSentinel1VHasc = {"opacity":1,"bands":["VH"],"min":-29.241399964337173,"max":-9.182101656959636,"gamma":1},
+    imageVisParamSentinel1VVdesc = {"opacity":1,"bands":["VV"],"min":-37.8913341783992,"max":1.4790850849279835,"gamma":1},
+    imageVisParamSentinel1VVasc = {"opacity":1,"bands":["VV"],"min":-22.277152505486562,"max":0.4267955523945029,"gamma":1},
+    imageVisParamMeanSpectralIndexes = {"opacity":1,"bands":["NDVI"],"min":1694.109409190372,"max":6457.479212253829,"gamma":1};
+
+
+
+/*Export.table.toDrive({
+  collection: ee.FeatureCollection(ee.Feature(Hunan)),
+  description:'vectorsToDriveExample',
+  fileFormat: 'SHP'
+});*/
+
+var SVI = NdviEvi.filterBounds(Hunan).filterDate('2000-01-01','2019-12-31');
+var NDWI_Img = Ndwi.filterBounds(Hunan).filterDate('2000-01-01','2019-12-31');
+
+print('Number of SVI image: ',SVI);
+print('Number of NDWI image: ',NDWI_Img);
+
+var Mask1 = function(image){
+  var cropMask  = image.mask(Croplands.select(['landcover']).eq(1));
+  return cropMask;
+};
+var Mask2 = function(image){
+  var waterMask = image.mask(WaterMask.select(['water_mask']).eq(0));
+  return waterMask;
+};
+var Mask3 = function(image){
+  var Diff = Mask1(image).subtract(Mask2(image));
+  var Masking = image.mask(Diff.eq(0));
+  return Masking;
+};
+
+var SVI = SVI.map(Mask3);
+
+//var plotSVI = ui.Chart.image.doySeries();
+
+/*-----------LOADING SENTINEL IMAGES-----------------*/
+var Sentinel1 = ee.ImageCollection("COPERNICUS/S1_GRD");
+var Sentinel1VVasc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
+  .filterBounds(Hunan).select('VV')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
+var Sentinel1VVdesc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
+  .filterBounds(Hunan).select('VV')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'));
+var Sentinel1VHasc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+  .filterBounds(Hunan).select('VH')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
+var Sentinel1VHdesc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+  .filterBounds(Hunan).select('VH')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'));
+
+var Sentinel1VHasc_MarApr = Sentinel1VHasc.filter(ee.Filter.calendarRange(2015,2020,'year'))
+.filter(ee.Filter.calendarRange(3,4,'month'));
+print('Number of sentinel mar-apr image: ',Sentinel1VHasc.filter(ee.Filter.calendarRange(2015,2019,'year')).filter(ee.Filter.calendarRange(3,4,'month')));
+
+var Sentinel1VHasc_JunJul = Sentinel1VHasc.filter(ee.Filter.calendarRange(2015,2020,'year'))
+.filter(ee.Filter.calendarRange(6,7,'month')).median();
+print('Number of sentinel jun-jul image: ',Sentinel1VHasc.filter(ee.Filter.calendarRange(2015,2019,'year')).filter(ee.Filter.calendarRange(6,7,'month')));
+
+var SentinelVHDiff = Sentinel1VHasc_MarApr.mean().subtract(Sentinel1VHasc_JunJul);
+
+//The Change Detection and Thresholding (CDAT) algorithm
+var SentinelVHDiffCDAT = function(imageFlood){
+  var imageDiff = imageFlood.subtract(Sentinel1VHasc_JunJul);
+  var imageDiffAbs = imageDiff.abs();
+  return imageDiffAbs;
+};
+var SentinelVHDiffAbs = Sentinel1VHasc_MarApr.map(SentinelVHDiffCDAT);
+var SentinelVHDiffAbsMean = SentinelVHDiffAbs.mean();
+var SentinelVHDiffAbsDesv = SentinelVHDiffAbs.reduce(ee.Reducer.stdDev());
+
+var FloodedAreas = SentinelVHDiffAbsMean.subtract(1.5).multiply(SentinelVHDiffAbsDesv);
+//print("Flooded Areas: ", FloodedAreas);
+
+print('Number of sentinel image: ',Sentinel1VHasc);
+/*-----------CLASIFICATION-----------------*/
+
+var NDWI = function(image){
+  var ndwi= image.expression('(B2-B7)/(B2+B7)',{
+    'B2': image.select(['sur_refl_b02']),
+    'B7': image.select(['sur_refl_b07'])
+  }).set('system:time_start', image.get('system:time_start')).
+    rename('NDWI2');
+    return image.addBands(ndwi);
+};
+
+var SVI = SVI.map(NDWI);
+
+
+/*------------SUPERVISED CLASSIFICATION WITH SMILECART-------------------------*/
+
+var trainingPoints = ee.FeatureCollection([
+  ee.Feature(crops1,{'class':1}),
+  ee.Feature(NonCrop1,{'class':2})
+]);
+var testingPoints = ee.FeatureCollection([
+  ee.Feature(crops2,{'class':1}),
+  ee.Feature(NonCrop2,{'class':2})
+]);
+var seriesLabel = ui.Chart.image.doySeriesByRegion(
+    SVI, 'EVI', trainingPoints, ee.Reducer.mean(), 30, ee.Reducer.mean(), 'class');
+print(seriesLabel); 
+
+var plotCrops_StdDev_EVI_NDVI = ui.Chart.image.doySeries({
+  imageCollection: SVI.select(['NDVI','EVI']),
+  region: crops1,
+  regionReducer: ee.Reducer.stdDev(),
+  scale: 30
+});
+
+print(plotCrops_StdDev_EVI_NDVI);
+
+var plotCrops_Mean_EVI_NDVI = ui.Chart.image.doySeries({
+  imageCollection: SVI.select(['NDVI','EVI']),
+  region: crops1,
+  regionReducer: ee.Reducer.mean(),
+  scale: 30
+});
+
+print(plotCrops_Mean_EVI_NDVI);
+
+var plotCrops2plotCrops_StdDev_NDWI = ui.Chart.image.doySeries({
+  imageCollection: NDWI_Img.select(['NDWI']),
+  region: crops1,
+  regionReducer: ee.Reducer.stdDev(),
+  scale: 30
+});
+print(plotCrops2plotCrops_StdDev_NDWI);
+
+var plotCrops2plotCrops_Mean_NDWI = ui.Chart.image.doySeries({
+  imageCollection: NDWI_Img.select(['NDWI']),
+  region: crops1,
+  regionReducer: ee.Reducer.mean(),
+  scale: 30
+});
+print(plotCrops2plotCrops_Mean_NDWI);
+
+var january = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(1,1,'month')).mean();
+var february = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(2,2,'month')).mean();
+var march = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(3,3,'month')).mean();
+var april = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(4,4,'month')).mean();
+var may = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(5,5,'month')).mean();
+var june = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(6,6,'month')).mean();
+var july = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(7,7,'month')).mean();
+var august = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(8,8,'month')).mean();
+var september = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(9,9,'month')).mean();
+var october = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(10,10,'month')).mean();
+var november = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(11,11,'month')).mean();
+var december = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(12,12,'month')).mean();
+
+var january2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(1,1,'month')).mean();
+var february2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(2,2,'month')).mean();
+var march2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(3,3,'month')).mean();
+var april2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(4,4,'month')).mean();
+var may2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(5,5,'month')).mean();
+var june2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(6,6,'month')).mean();
+var july2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(7,7,'month')).mean();
+var august2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(8,8,'month')).mean();
+var september2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(9,9,'month')).mean();
+var october2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(10,10,'month')).mean();
+var november2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(11,11,'month')).mean();
+var december2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(12,12,'month')).mean();
+
+var jan = january2.addBands(january.select(['NDWI']));
+var feb = february2.addBands(february.select(['NDWI']));
+var mar = march2.addBands(march.select(['NDWI']));
+var apr = april2.addBands(april.select(['NDWI']));
+var may = may2.addBands(may.select(['NDWI']));
+var jun = june2.addBands(june.select(['NDWI']));
+var jul = july2.addBands(july.select(['NDWI']));
+var aug = august2.addBands(august.select(['NDWI']));
+var sep = september2.addBands(september.select(['NDWI']));
+var oct = october2.addBands(october.select(['NDWI']));
+var nov = november2.addBands(november.select(['NDWI']));
+var dec = december.addBands(december.select(['NDWI']));
+
+/*
+Export.image.toDrive({
+  image: jan.clip(Hunan).toFloat(), 
+  description:'Chn_Jan', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: feb.clip(Hunan).toFloat(), 
+  description:'Chn_Feb', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: mar.clip(Hunan).toFloat(), 
+  description:'Chn_Mar', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: apr.clip(Hunan).toFloat(), 
+  description:'Chn_Apr', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: may.clip(Hunan).toFloat(), 
+  description:'Chn_May', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: jun.clip(Hunan).toFloat(), 
+  description:'Chn_Jun', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: jul.clip(Hunan).toFloat(), 
+  description:'Chn_Jul', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: aug.clip(Hunan).toFloat(), 
+  description:'Chn_Aug', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: sep.clip(Hunan).toFloat(), 
+  description:'Chn_Sep', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: oct.clip(Hunan).toFloat(), 
+  description:'Chn_Oct', 
+  scale:250,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: nov.clip(Hunan).toFloat(), 
+  description:'Chn_Nov', 
+  scale:250,
+  region: Hunan});
+  
+Export.image.toDrive({
+  image: dec.clip(Hunan).toFloat(), 
+  description:'Chn_Dec', 
+  scale:250,
+  region: Hunan});
+*/
+/*
+Export.image.toDrive({
+  image: Sentinel1VHasc_MarApr.clip(Hunan), 
+  description:'Chn_MarApr', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: Hunan});
+Export.image.toDrive({
+  image: Sentinel1VHasc_JunJul.clip(Hunan), 
+  description:'Chn_JunJul', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: Hunan});
+Export.image.toDrive({
+  image: SentinelVHDiff.clip(Hunan), 
+  description:'Chn_Diff', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: Hunan});
+
+Export.image.toDrive({
+  image: FloodedAreas.updateMask(FloodedAreas).clip(Hunan), 
+  description:'Chn_DiffFloodedArea3', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: Hunan});*/
+  
+  
+/*Training inputs*/
+
+var bandas = ['NDVI', 'EVI', 'sur_refl_b01', 'sur_refl_b02', 'sur_refl_b03' ,'sur_refl_b07','NDWI2','NDWI','VH'];
+
+var APRILtoC = NdviEvi.filterBounds(Hunan).filterDate('2000-01-01','2019-12-31');
+var APRILtoC = APRILtoC.map(NDWI);
+var APRILtoC = APRILtoC.filter(ee.Filter.calendarRange(2000,2019,'year'))
+                .filter(ee.Filter.calendarRange(4,4,'month')).mean();
+
+var APRILtoC = APRILtoC.addBands(april.select(['NDWI']));
+var APRILtoC = APRILtoC.addBands(FloodedAreas.updateMask(FloodedAreas).select(['VH']));
+
+var training = APRILtoC.select(bandas).sampleRegions({
+  collection: trainingPoints,
+  properties: ['class'],
+  scale: 250
+}); 
+
+/*Accuracy of trained inputs*/
+
+var trained = ee.Classifier.smileCart().train(training, 'class', bandas);
+var trainAccuracy = trained.confusionMatrix();
+print('Resubstitution error matrix: ', trainAccuracy);
+print('Training overall accuracy: ', trainAccuracy.accuracy());
+
+/*Make classification*/
+var classified = APRILtoC.select(bandas).classify(trained);
+print(classified);
+
+var classified = classified.mask(WaterMask.select(['water_mask']).eq(0));
+
+/*Validation of classification*/
+var validation = APRILtoC.select(bandas).sampleRegions({
+  collection: testingPoints,
+  properties: ['class'],
+  scale: 250
+}); 
+
+var validated = validation.classify(trained);
+
+var testAccuracy = validated.errorMatrix('class', 'classification');
+print('Validation error matrix: ', testAccuracy);
+print('Validation overall accuracy: ', testAccuracy.accuracy());
+
+/*Export.image.toDrive({
+  image: classified.clip(Hunan), 
+  description:'Chn_Classified4', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: Hunan});*/
+
+
+
+
+Map.setCenter(112.0888853667166, 29.53008305449045, 10);
+Map.addLayer(SVI.mean().clip(Hunan),imageVisParamMeanSpectralIndexes,'Mean Spectral Indexes');
+Map.addLayer(Sentinel1VVasc.mean().clip(Hunan),imageVisParamSentinel1VVasc,'Sentinel1VVasc');
+Map.addLayer(Sentinel1VVdesc.mean().clip(Hunan),imageVisParamSentinel1VVdesc,'Sentinel1VVdesc');
+Map.addLayer(Sentinel1VHasc.mean().clip(Hunan),imageVisParamSentinel1VHasc,'Sentinel1VHasc');
+Map.addLayer(Sentinel1VHdesc.mean().clip(Hunan),imageVisParamSentinel1VHdesc,'Sentinel1VHdesc');
+Map.addLayer(Sentinel1VHasc_MarApr.median().clip(Hunan),imageVisParamSentinel1VHascMarApr,'Sentinel1VHasc_MarApr');
+Map.addLayer(Sentinel1VHasc_JunJul.clip(Hunan),imageVisParamSentinel1VHascJunJul,'Sentinel1VHasc_JunJul');
+Map.addLayer(apr.clip(Hunan),imageVisParamApril,'April');
+Map.addLayer(jun.clip(Hunan),imageVisParamJune,'June');
+Map.addLayer(sep.clip(Hunan),imageVisParamSeptember,'September');
+Map.addLayer(nov.clip(Hunan),imageVisParamNovember,'November');
+Map.addLayer(SentinelVHDiff.clip(Hunan),{},'SentinelVHDiff');
+Map.addLayer(FloodedAreas.clip(Hunan),{},'SentinelVHDiffFlooded');
+Map.addLayer(FloodedAreas.updateMask(FloodedAreas).clip(Hunan),VisParamSentinelVHDiffFlooded,'SentinelVHDiffFloodedMask');
+Map.addLayer(classified.clip(Hunan),VisParamClassified,'Classified');

@@ -1,0 +1,640 @@
+var NdviEvi = ee.ImageCollection("MODIS/006/MOD13Q1"),
+    Ndwi = ee.ImageCollection("MODIS/MCD43A4_NDWI"),
+    WaterMask = ee.Image("MODIS/MOD44W/MOD44W_005_2000_02_24"),
+    Croplands = ee.Image("USGS/GFSAD1000_V0"),
+    Center = /* color: #d63000 */ee.Geometry.Point([-57.34971401618218, -30.1945753458267]),
+    RioGrandeDoSul = 
+    /* color: #98ff00 */
+    /* shown: false */
+    /* displayProperties: [
+      {
+        "type": "rectangle"
+      }
+    ] */
+    ee.Geometry.Polygon(
+        [[[-57.50935909674871, -30.139662860453758],
+          [-57.50935909674871, -30.257167898511362],
+          [-57.189382290108085, -30.257167898511362],
+          [-57.189382290108085, -30.139662860453758]]], null, false),
+    crops1 = 
+    /* color: #d63000 */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[-57.49054331329972, -30.224119008073323],
+         [-57.163013406073155, -30.087118686090903],
+         [-57.54015345123917, -30.25807985023494],
+         [-57.392009682928624, -30.244437603387546],
+         [-57.3825683071962, -30.237170850971722],
+         [-57.353557534491124, -30.226047230293577],
+         [-57.41209406403214, -30.10404993389705],
+         [-57.31253046539933, -30.195042768968833],
+         [-57.25519556549698, -30.14443557987681],
+         [-57.359994836126866, -30.25600397835934],
+         [-57.39252466705948, -30.213587281217716],
+         [-57.40351099518448, -30.054287571088626],
+         [-57.341026253973546, -30.220559113883155],
+         [-57.34514612702042, -30.231386725279936],
+         [-57.28300470856339, -30.110584025796427],
+         [-57.18635935333878, -30.234352986095086],
+         [-57.497066445623936, -30.155419992480457],
+         [-57.47578043488175, -30.173823562950247],
+         [-57.33724970368058, -30.187078712504643],
+         [-57.24970240143448, -30.197464909853952],
+         [-57.44245795141674, -30.263519336588903],
+         [-57.36366537939526, -30.248543249750323],
+         [-57.353966511597406, -30.24869153902938],
+         [-57.21500662695385, -30.22696477465981],
+         [-57.41421965490795, -30.2561057176117],
+         [-57.1309783829353, -30.064641116171508],
+         [-57.302811421265375, -30.13459104323219],
+         [-57.306855035211576, -30.23595438199685],
+         [-57.346337151910795, -30.178097101001786],
+         [-57.218277764703764, -30.045936577842653],
+         [-57.25175173320962, -30.191155048441814],
+         [-57.13090212383462, -30.071640047034307],
+         [-57.21865643996603, -30.09913243169955],
+         [-57.27908124465353, -30.246645387184167],
+         [-57.33178128737814, -30.248869745835247],
+         [-57.33281125563986, -30.25583907684051],
+         [-57.19067563552267, -30.197845126915396],
+         [-57.35049237746603, -30.254059720183477],
+         [-57.33174222456889, -30.175824119772138],
+         [-57.26805585371928, -30.197487995052487],
+         [-57.239560065145064, -30.2054994540151],
+         [-57.23990338789897, -30.19392713734519],
+         [-57.26170438277202, -30.190366150863444],
+         [-57.34101193892436, -30.17300449797283],
+         [-57.28058713423686, -30.161725204079882],
+         [-57.41671460616069, -30.236455356434437],
+         [-57.32582947755661, -30.24274996074694],
+         [-57.26797959352341, -30.24690222076902],
+         [-57.46813675905075, -30.137995746036193],
+         [-57.18352219606247, -30.179703051862457]]),
+    crops2 = 
+    /* color: #98ff00 */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[-57.504700632341766, -30.157589987059986],
+         [-57.19141861940231, -30.198547183344818],
+         [-57.30540177369919, -30.235928009838688],
+         [-57.437961038131014, -30.237765435196717],
+         [-57.54387610771109, -30.255338084074097],
+         [-57.44002097465445, -30.262825894939258],
+         [-57.38817923881461, -30.24073150354289],
+         [-57.254197534102694, -30.144882278779548],
+         [-57.18223176103541, -30.23123976978707],
+         [-57.3133810530276, -30.192521805855627],
+         [-57.35449395280787, -30.246737517787174],
+         [-57.32364509427084, -30.24227325824166],
+         [-57.33205650174154, -30.249762064964496],
+         [-57.357376554842126, -30.22438695294494],
+         [-57.414110639925134, -30.102536110089556],
+         [-57.133701780672205, -30.117460164960722],
+         [-57.219360807771814, -30.099937163635293],
+         [-57.33334396206869, -30.190729366445314],
+         [-57.34201286160482, -30.187539218475997],
+         [-57.48835418545736, -30.156299986823274],
+         [-57.470501402254236, -30.13915501453442],
+         [-57.326241340515445, -30.170594405563264],
+         [-57.28908984767255, -30.224300675451115],
+         [-57.44253895380332, -30.2387151724558],
+         [-57.48923084833457, -30.225144399518037],
+         [-57.18232046595552, -30.179430057886012],
+         [-57.1318520211313, -30.063020845056922]]),
+    RioGrandeDoSul2 = 
+    /* color: #d63000 */
+    /* shown: false */
+    ee.Geometry.Polygon(
+        [[[-57.078506285408906, -30.0674607121418],
+          [-57.30509930298703, -29.94853984596945],
+          [-57.317458922127656, -29.98661003056609],
+          [-57.339431578377656, -30.018720399907025],
+          [-57.37651043579953, -30.02942154684581],
+          [-57.41770916626828, -30.05438639695123],
+          [-57.42869549439328, -30.08172163185648],
+          [-57.45616131470578, -30.12092855914528],
+          [-57.490493590096406, -30.14943291612472],
+          [-57.54679852173703, -30.17080578036826],
+          [-57.58525067017453, -30.18979999191526],
+          [-57.550918394783906, -30.20879054084404],
+          [-57.54867299962717, -30.222951853154576],
+          [-57.55862935949045, -30.248164380299627],
+          [-57.553822840935766, -30.261213030368722],
+          [-57.541119899041234, -30.272184417009733],
+          [-57.5229237930842, -30.28107923578961],
+          [-57.504384364373266, -30.282265150714984],
+          [-57.4954579727717, -30.266550614847425],
+          [-57.4679921524592, -30.261509570451437],
+          [-57.455975856072484, -30.266254089988298],
+          [-57.443959559685766, -30.271591400428647],
+          [-57.42233022618967, -30.271591400428647],
+          [-57.40962728429514, -30.27870736294036],
+          [-57.41443380284983, -30.288194510335895],
+          [-57.4072240250178, -30.2941235115829],
+          [-57.39349111486155, -30.28700866708029],
+          [-57.38834127355295, -30.27307393516398],
+          [-57.37220510411936, -30.268033225709623],
+          [-57.35950216222483, -30.265661037583413],
+          [-57.35469564367014, -30.272777430008222],
+          [-57.346112574822484, -30.27366694278847],
+          [-57.32997640538889, -30.265957564233627],
+          [-57.32173665929514, -30.25913722471717],
+          [-57.315503913671634, -30.25265870528215],
+          [-57.306234199316165, -30.25710709993457],
+          [-57.297994453222415, -30.269561533127877],
+          [-57.29044135263648, -30.28468264946737],
+          [-57.28220160654273, -30.28586852083935],
+          [-57.276021796972415, -30.27786361092024],
+          [-57.27190192392554, -30.26541023091638],
+          [-57.26160224130835, -30.26007258444735],
+          [-57.2533624952146, -30.26748590396358],
+          [-57.249585944921634, -30.278753077604676],
+          [-57.240316230566165, -30.283496763761423],
+          [-57.2310465162107, -30.28468264946737],
+          [-57.21628363779273, -30.282014386472355],
+          [-57.20255072763648, -30.263927580445156],
+          [-57.18950446298804, -30.25265870528215],
+          [-57.17371161630835, -30.24376131166263],
+          [-57.167188483984134, -30.231006975905785],
+          [-57.17027838876929, -30.214097515252195],
+          [-57.173250752983726, -30.20341635822852],
+          [-57.167757588921226, -30.190360036573434],
+          [-57.15745790630404, -30.176114802199447],
+          [-57.14715822368685, -30.157117952548017],
+          [-57.1334253135306, -30.135445202480117],
+          [-57.12165644674473, -30.125096159167406],
+          [-57.11410334615879, -30.10727750849509],
+          [-57.095563917447855, -30.103119360864195],
+          [-57.08492091207676, -30.086187953668862],
+          [-57.069814710904886, -30.080840591119546]]]),
+    NonCrop1 = 
+    /* color: #0b4a8b */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[-57.478479530852276, -30.219504438658667],
+         [-57.4633733296804, -30.163715350044484],
+         [-57.523060734922055, -30.236241870134954],
+         [-57.45233624761737, -30.248105790356494],
+         [-57.49319165533221, -30.19826770386068],
+         [-57.37680524175799, -30.21725661930399],
+         [-57.248402531797055, -30.212509733946735],
+         [-57.231923039609555, -30.282503057785654],
+         [-57.2068604785744, -30.18432038610751],
+         [-57.4046143848244, -30.167106080031715],
+         [-57.498341496640805, -30.175120010422408],
+         [-57.377491887265805, -30.18194617785871],
+         [-57.30196088140643, -30.173042387336714],
+         [-57.17561810796893, -30.214586524471606],
+         [-57.149525578672055, -30.12286934019295],
+         [-57.099057133847836, -30.086633890853015],
+         [-57.073651250058774, -30.080395301233917],
+         [-57.184201176816586, -30.072076569669637],
+         [-57.193470891172055, -30.134450000381293],
+         [-57.15261548345721, -30.129105249092067],
+         [-57.3496827441994, -30.067025569985237],
+         [-57.373028691465024, -30.091089785361586],
+         [-57.37337201421893, -30.108911355233996],
+         [-57.17905133550799, -30.088416272751093],
+         [-57.3551759082619, -30.12999606106953],
+         [-57.4156007129494, -30.189068630935814],
+         [-57.43002026861346, -30.112475283574987],
+         [-57.22436993902362, -30.148107494353773],
+         [-57.5254639941994, -30.188771872340176],
+         [-57.17184155767596, -30.029877951560447],
+         [-57.29269116705096, -30.040875098186905],
+         [-57.23604291265643, -29.99063494777432],
+         [-57.13338940923846, -30.097624734080664],
+         [-57.236386235410336, -30.067322694750057],
+         [-57.20377057378924, -30.04176670523547],
+         [-57.17218488042987, -30.052762532372395],
+         [-57.247372563535336, -30.11485116437738],
+         [-57.266598637754086, -30.032255816398123],
+         [-57.325306828672055, -30.09257503891016],
+         [-57.30814069097674, -30.140388273503735],
+         [-57.34521954839862, -30.111584313542426],
+         [-57.21887677496112, -30.01144756506438],
+         [-57.42710958949068, -30.117085043853194],
+         [-57.40513693324068, -30.074014312094693],
+         [-57.43019949427583, -30.0906507498178],
+         [-57.1538246773813, -30.15716850483286],
+         [-57.15794455042818, -30.138168004678676],
+         [-57.20188986292818, -30.108472398843517],
+         [-57.45079885951021, -30.202576738473358],
+         [-57.10919271937349, -30.103720273303043]]),
+    NonCrop2 = 
+    /* color: #ffc82d */
+    /* shown: false */
+    ee.Geometry.MultiPoint(
+        [[-57.49461570028587, -30.200812680192758],
+         [-57.42972769979759, -30.113240572736395],
+         [-57.405426281951726, -30.166951876781905],
+         [-57.378990429900945, -30.17763698920849],
+         [-57.459671277068914, -30.163389915216563],
+         [-57.47924067404157, -30.220959176314423],
+         [-57.52146937277204, -30.235791158329107],
+         [-57.24921442892438, -30.213542346441326],
+         [-57.224151867889226, -30.14706261149336],
+         [-57.416137305173955, -30.12913026840341],
+         [-57.37289947346958, -30.091084247402105],
+         [-57.08897155598911, -30.089301913593644],
+         [-57.325864256184424, -30.092569501033864],
+         [-57.23625701741489, -30.067614279349282],
+         [-57.21840423421177, -30.01186606843844],
+         [-57.17171233968052, -30.030296377153395],
+         [-57.50267547444614, -30.163368314900872],
+         [-57.174802244465674, -30.214410806426038],
+         [-57.150083006184424, -30.15624400412942],
+         [-57.26612609700474, -30.02821570740806],
+         [-57.48859924153599, -30.166135226611726],
+         [-57.194028318684424, -30.2276435171504],
+         [-57.1926550276688, -30.252261707742345],
+         [-57.23282378987583, -30.281321028273215],
+         [-57.378049314778174, -30.18224684347097],
+         [-57.452207029621924, -30.248406253850565],
+         [-57.23727200314494, -29.990069001298465]]),
+    VisParamClass = {"opacity":1,"bands":["classification"],"min":0,"max":2,"gamma":1},
+    VisParamFloodedMask = {"opacity":1,"bands":["VH"],"min":0.002086464113188802,"max":161.9835546237432,"gamma":1},
+    VisParamNovember = {"opacity":1,"bands":["NDVI"],"min":460.45714285714286,"max":7978.971428571429,"gamma":1},
+    VisParamSeptember = {"opacity":1,"bands":["NDVI"],"min":651.2,"max":7564.775,"gamma":1},
+    VisParamJune = {"opacity":1,"bands":["NDVI"],"min":227.275,"max":7739.975,"gamma":1},
+    VisParamApril = {"opacity":1,"bands":["NDVI"],"min":1489.15,"max":7841.675,"gamma":1},
+    VisParamSentinel1VHdescEneFeb = {"opacity":1,"bands":["VH"],"min":-28.645282199386305,"max":-14.446146671298514,"gamma":1},
+    VisParamSentinel1VHdescOctNov = {"opacity":1,"bands":["VH"],"min":-28.806297347090457,"max":-14.742608710677064,"gamma":1},
+    VisParamSentinel1VHdesc = {"opacity":1,"bands":["VH"],"min":-30.38918230334112,"max":-14.503554646263542,"gamma":1},
+    VisParamSentinel1VHasc = {"opacity":1,"bands":["VH"],"min":-30.390463763790475,"max":-12.696313970883402,"gamma":1},
+    VisParamSentinel1VVdesc = {"opacity":1,"bands":["VV"],"min":-24.782100522522313,"max":-8.827229049733045,"gamma":1},
+    VisParamSentinel1VVasc = {"opacity":1,"bands":["VV"],"min":-25.283205345458192,"max":-7.031466239658791,"gamma":1},
+    VisParamMeanSpectralIndexes = {"opacity":1,"bands":["NDVI"],"min":1017.960612691466,"max":7698.868708971554,"gamma":1},
+    VisParamSentinelVHDiff = {"opacity":1,"bands":["VH"],"min":-5.0245172301753485,"max":1.8757894080614754,"gamma":1};
+
+/*Export.table.toDrive({
+  collection: ee.FeatureCollection(ee.Feature(RioGrandeDoSul2)),
+  description:'vectorsToDriveExample',
+  fileFormat: 'SHP'
+});*/
+
+
+var SVI = NdviEvi.filterBounds(RioGrandeDoSul2).filterDate('2000-01-01','2019-12-31');
+var NDWI_Img = Ndwi.filterBounds(RioGrandeDoSul2).filterDate('2000-01-01','2019-12-31');
+
+print("Number of img. ndvi evi: ",SVI);
+print("Number of img. ndwi: ",NDWI_Img);
+
+var Mask1 = function(image){
+  var cropMask  = image.mask(Croplands.select(['landcover']).eq(1));
+  return cropMask;
+};
+var Mask2 = function(image){
+  var waterMask = image.mask(WaterMask.select(['water_mask']).eq(0));
+  return waterMask;
+};
+var Mask3 = function(image){
+  var Diff = Mask1(image).subtract(Mask2(image));
+  var Masking = image.mask(Diff.eq(0));
+  return Masking;
+};
+
+var SVI = SVI.map(Mask2);
+
+//var plotSVI = ui.Chart.image.doySeries();
+
+/*-----------LOADING SENTINEL IMAGES-----------------*/
+var Sentinel1 = ee.ImageCollection("COPERNICUS/S1_GRD");
+var Sentinel1VVasc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
+  .filterBounds(RioGrandeDoSul2).select('VV')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
+var Sentinel1VVdesc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VV'))
+  .filterBounds(RioGrandeDoSul2).select('VV')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'));
+var Sentinel1VHasc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+  .filterBounds(RioGrandeDoSul2).select('VH')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'ASCENDING'));
+var Sentinel1VHdesc = Sentinel1.filterDate('2015-01-01','2019-12-31')
+  .filter(ee.Filter.eq('instrumentMode', 'IW'))
+  .filter(ee.Filter.listContains('transmitterReceiverPolarisation', 'VH'))
+  .filterBounds(RioGrandeDoSul2).select('VH')
+  .filter(ee.Filter.eq('orbitProperties_pass', 'DESCENDING'));
+
+var Sentinel1VHdesc_OctNov = Sentinel1VHdesc.filter(ee.Filter.calendarRange(2015,2019,'year'))
+.filter(ee.Filter.calendarRange(10,11,'month'));
+print('Number of sentinel oct-nov image: ',Sentinel1VHdesc.filter(ee.Filter.calendarRange(2015,2019,'year')).filter(ee.Filter.calendarRange(10,11,'month')));
+var Sentinel1VHdesc_EneFeb = Sentinel1VHdesc.filter(ee.Filter.calendarRange(2015,2019,'year'))
+.filter(ee.Filter.calendarRange(1,2,'month')).median();
+print('Number of sentinel ene-feb image: ',Sentinel1VHdesc.filter(ee.Filter.calendarRange(2015,2019,'year')).filter(ee.Filter.calendarRange(10,11,'month')));
+var SentinelVHDiff = Sentinel1VHdesc_OctNov.median().subtract(Sentinel1VHdesc_EneFeb);
+
+print('Number of sentinel image: ',Sentinel1VHdesc);
+
+//The Change Detection and Thresholding (CDAT) algorithm
+var SentinelVHDiffCDAT = function(imageFlood){
+  var imageDiff = imageFlood.subtract(Sentinel1VHdesc_EneFeb);
+  var imageDiffAbs = imageDiff.abs();
+  return imageDiffAbs;
+};
+var SentinelVHDiffAbs = Sentinel1VHdesc_OctNov.map(SentinelVHDiffCDAT);
+var SentinelVHDiffAbsMean = SentinelVHDiffAbs.mean();
+var SentinelVHDiffAbsDesv = SentinelVHDiffAbs.reduce(ee.Reducer.stdDev());
+
+var FloodedAreas = SentinelVHDiffAbsMean.subtract(1.5).multiply(SentinelVHDiffAbsDesv);
+//print("Flooded Areas: ", FloodedAreas);
+/*-----------CLASIFICATION-----------------*/
+
+var NDWI = function(image){
+  var ndwi= image.expression('(B2-B7)/(B2+B7)',{
+    'B2': image.select(['sur_refl_b02']),
+    'B7': image.select(['sur_refl_b07'])
+  }).set('system:time_start', image.get('system:time_start')).
+    rename('NDWI2');
+    return image.addBands(ndwi);
+};
+
+var SVI = SVI.map(NDWI);
+
+
+/*------------SUPERVISED CLASSIFICATION WITH SMILECART-------------------------*/
+
+var trainingPoints = ee.FeatureCollection([
+  ee.Feature(crops1,{'class':1}),
+  ee.Feature(NonCrop1,{'class':2})
+]);
+var testingPoints = ee.FeatureCollection([
+  ee.Feature(crops2,{'class':1}),
+  ee.Feature(NonCrop2,{'class':2})
+]);
+var seriesLabel = ui.Chart.image.doySeriesByRegion(
+    SVI, 'EVI', trainingPoints, ee.Reducer.mean(), 30, ee.Reducer.mean(), 'class');
+print(seriesLabel); 
+
+var plotCropsStdDev_NDIV_EVI = ui.Chart.image.doySeries({
+  imageCollection: SVI.select(['NDVI','EVI']),
+  region: crops1,
+  regionReducer: ee.Reducer.stdDev(),
+  scale: 250
+});
+
+print(plotCropsStdDev_NDIV_EVI);
+
+var plotCropsMean_NDIV_EVI = ui.Chart.image.doySeries({
+  imageCollection: SVI.select(['NDVI','EVI']),
+  region: crops1,
+  regionReducer: ee.Reducer.mean(),
+  scale: 250
+});
+
+print(plotCropsMean_NDIV_EVI);
+
+var plotCrops2StdDev_NDWI = ui.Chart.image.doySeries({
+  imageCollection: NDWI_Img.select(['NDWI']),
+  region: crops1,
+  regionReducer: ee.Reducer.stdDev(),
+  scale: 250
+});
+print(plotCrops2StdDev_NDWI);
+
+var plotCrops2Mean_NDWI = ui.Chart.image.doySeries({
+  imageCollection: NDWI_Img.select(['NDWI']),
+  region: crops1,
+  regionReducer: ee.Reducer.mean(),
+  scale: 250
+});
+print(plotCrops2Mean_NDWI);
+
+var january = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(1,1,'month')).mean();
+var february = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(2,2,'month')).mean();
+var march = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(3,3,'month')).mean();
+var april = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(4,4,'month')).mean();
+var may = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(5,5,'month')).mean();
+var june = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(6,6,'month')).mean();
+var july = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(7,7,'month')).mean();
+var august = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(8,8,'month')).mean();
+var september = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(9,9,'month')).mean();
+var october = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(10,10,'month')).mean();
+var november = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(11,11,'month')).mean();
+var december = NDWI_Img.filter(ee.Filter.calendarRange(2000,2017,'year'))
+.filter(ee.Filter.calendarRange(12,12,'month')).mean();
+
+var january2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(1,1,'month')).mean();
+var february2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(2,2,'month')).mean();
+var march2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(3,3,'month')).mean();
+var april2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(4,4,'month')).mean();
+var may2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(5,5,'month')).mean();
+var june2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(6,6,'month')).mean();
+var july2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(7,7,'month')).mean();
+var august2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(8,8,'month')).mean();
+var september2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(9,9,'month')).mean();
+var october2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(10,10,'month')).mean();
+var november2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(11,11,'month')).mean();
+var december2 = SVI.filter(ee.Filter.calendarRange(2000,2019,'year'))
+.filter(ee.Filter.calendarRange(12,12,'month')).mean();
+
+var jan = january2.addBands(january.select(['NDWI']));
+var feb = february2.addBands(february.select(['NDWI']));
+var mar = march2.addBands(march.select(['NDWI']));
+var apr = april2.addBands(april.select(['NDWI']));
+var may = may2.addBands(may.select(['NDWI']));
+var jun = june2.addBands(june.select(['NDWI']));
+var jul = july2.addBands(july.select(['NDWI']));
+var aug = august2.addBands(august.select(['NDWI']));
+var sep = september2.addBands(september.select(['NDWI']));
+var oct = october2.addBands(october.select(['NDWI']));
+var nov = november2.addBands(november.select(['NDWI']));
+var dec = december.addBands(december.select(['NDWI']));
+
+/*
+Export.image.toDrive({
+  image: jan.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Jan', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: feb.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Feb', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: mar.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Mar', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: apr.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Apr', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: may.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_May', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: jun.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Jun', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: jul.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Jul', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: aug.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Aug', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: sep.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Sep', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: oct.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Oct', 
+  scale:250,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: nov.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Nov', 
+  scale:250,
+  region: RioGrandeDoSul2});
+  
+Export.image.toDrive({
+  image: dec.clip(RioGrandeDoSul2).toFloat(), 
+  description:'Brz_Dec', 
+  scale:250,
+  region: RioGrandeDoSul2});
+*/
+/*
+Export.image.toDrive({
+  image: Sentinel1VHdesc_OctNov.clip(RioGrandeDoSul2), 
+  description:'Brz_OctNov', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: RioGrandeDoSul2});
+Export.image.toDrive({
+  image: Sentinel1VHdesc_EneFeb.clip(RioGrandeDoSul2), 
+  description:'Brz_EneFeb', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: RioGrandeDoSul2});
+Export.image.toDrive({
+  image: SentinelVHDiff.clip(RioGrandeDoSul2), 
+  description:'Brz_Diff', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: RioGrandeDoSul2});
+
+Export.image.toDrive({
+  image: FloodedAreas.updateMask(FloodedAreas).clip(RioGrandeDoSul2), 
+  description:'Brz_DiffFloodedArea3', 
+  scale:10,
+  maxPixels: 3784216672400,
+  region: RioGrandeDoSul2});*/
+  
+/*Training inputs*/
+
+var bandas = ['NDVI', 'EVI', 'sur_refl_b01', 'sur_refl_b02', 'sur_refl_b03' ,'sur_refl_b07','NDWI2','NDWI','VH'];
+
+var APRILtoC = NdviEvi.filterBounds(RioGrandeDoSul2).filterDate('2000-01-01','2019-12-31');
+var APRILtoC = APRILtoC.map(NDWI);
+var APRILtoC = APRILtoC.filter(ee.Filter.calendarRange(2000,2019,'year'))
+                .filter(ee.Filter.calendarRange(4,4,'month')).mean();
+
+var APRILtoC = APRILtoC.addBands(april.select(['NDWI']));
+var APRILtoC = APRILtoC.addBands(FloodedAreas.updateMask(FloodedAreas).select(['VH']));
+
+var training = APRILtoC.select(bandas).sampleRegions({
+  collection: trainingPoints,
+  properties: ['class'],
+  scale: 250
+}); 
+
+/*Accuracy of trained inputs*/
+
+var trained = ee.Classifier.smileCart().train(training, 'class', bandas);
+var trainAccuracy = trained.confusionMatrix();
+print('Resubstitution error matrix: ', trainAccuracy);
+print('Training overall accuracy: ', trainAccuracy.accuracy());
+
+print("TRAINED ALGORITHM",trained);
+/*Make classification*/
+var classified = APRILtoC.select(bandas).classify(trained);
+print(classified);
+
+var classified = classified.mask(WaterMask.select(['water_mask']).eq(0));
+
+/*Validation of classification*/
+var validation = APRILtoC.select(bandas).sampleRegions({
+  collection: testingPoints,
+  properties: ['class'],
+  scale: 250
+}); 
+
+var validated = validation.classify(trained);
+
+var testAccuracy = validated.errorMatrix('class', 'classification');
+print('Validation error matrix: ', testAccuracy);
+print('Validation overall accuracy: ', testAccuracy.accuracy());
+
+/*Export.image.toDrive({
+  image: classified.clip(RioGrandeDoSul2), 
+  description:'Brz_Classified4', 
+  scale:10,
+  region: RioGrandeDoSul2});*/
+
+
+
+
+Map.centerObject(Center,10);
+Map.addLayer(SVI.mean().clip(RioGrandeDoSul2),VisParamMeanSpectralIndexes,'Mean Spectral Indexes');
+Map.addLayer(Sentinel1VVasc.mean().clip(RioGrandeDoSul2),VisParamSentinel1VVasc,'Sentinel1VVasc');
+Map.addLayer(Sentinel1VVdesc.mean().clip(RioGrandeDoSul2),VisParamSentinel1VVdesc,'Sentinel1VVdesc');
+Map.addLayer(Sentinel1VHasc.mean().clip(RioGrandeDoSul2),VisParamSentinel1VHasc,'Sentinel1VHasc');
+Map.addLayer(Sentinel1VHdesc.mean().clip(RioGrandeDoSul2),VisParamSentinel1VHdesc,'Sentinel1VHdesc');
+Map.addLayer(Sentinel1VHdesc_OctNov.median().clip(RioGrandeDoSul2),VisParamSentinel1VHdescOctNov,'Sentinel1VHdesc_OctNov');
+Map.addLayer(Sentinel1VHdesc_EneFeb.clip(RioGrandeDoSul2),VisParamSentinel1VHdescEneFeb,'Sentinel1VHdesc_EneFeb');
+Map.addLayer(apr.clip(RioGrandeDoSul2),VisParamApril,'April');
+Map.addLayer(jun.clip(RioGrandeDoSul2),VisParamJune,'June');
+Map.addLayer(sep.clip(RioGrandeDoSul2),VisParamSeptember,'September');
+Map.addLayer(nov.clip(RioGrandeDoSul2),VisParamNovember,'November');
+Map.addLayer(SentinelVHDiff.clip(RioGrandeDoSul2),VisParamSentinelVHDiff,'SentinelVHDiff');
+Map.addLayer(FloodedAreas.clip(RioGrandeDoSul2),{},'SentinelVHDiffFlooded');
+Map.addLayer(FloodedAreas.updateMask(FloodedAreas).clip(RioGrandeDoSul2),VisParamFloodedMask,'SentinelVHDiffFloodedMask');
+Map.addLayer(classified.clip(RioGrandeDoSul2),VisParamClass,'Classified');
